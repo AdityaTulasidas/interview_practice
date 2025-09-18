@@ -1,3 +1,4 @@
+/*
 abstract class Animal {
     private String name;
     public Animal(String name) { this.name = name; }
@@ -25,7 +26,7 @@ public class OOPExample {
         cat.makeSound();
     }
 }
-package com.interview.practice;
 
 // OOP Example: Inheritance, Polymorphism, Encapsulation, Abstraction
 
+*/

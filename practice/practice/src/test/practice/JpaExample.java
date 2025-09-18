@@ -1,3 +1,4 @@
+/*
 package com.interview.practice;
 
 import javax.persistence.*;
@@ -20,3 +21,4 @@ public class JpaExample {
     // In a real app, inject and use PersonRepository
 }
 
+*/
