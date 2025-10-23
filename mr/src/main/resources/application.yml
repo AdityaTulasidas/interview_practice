@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: metadataregisrty
+  datasource:
+      url: jdbc:postgresql://${DATACONNECT_METADATA_REGISTRY_DB_CONN_STR:localhost}:5432/${METADATA_REGISTRY_DB:postgres}
+      username: ${DATACONNECT_METADATA_REGISTRY_DB_USER:postgresql}
+      password: ${DATACONNECT_METADATA_REGISTRY_DB_PASSWORD:postgresql}
+      driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        id:
+          new_generator-mappings: true
+        format_sql: true
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
+server:
+  port: 8080
+  servlet:
+    context-path: /data-connect/metadata-registry
+  # The URL of the UI application
+  # e.g. http://localhost:3000
+  # or https://example.com
+  ui-url: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+springdoc:
+  api-docs:
+    path: /openapi-endpoint
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,beans,env,loggers
+  health:
+    elasticsearch:
+      enabled: false
+    defaults:
+      exclude: elasticsearch
+  endpoint:
+    health:
+      show-details: always
+      exclude: elasticsearch
+logging:
+  level:
+    root: INFO
+    org.springframework: INFO
+    org.hibernate: INFO
+dataconnect:
+  data-integration-service:
+    api:
+      url: ${BASE_URL:http://localhost:8081}/data-connect/data-integration/jobs/execute
+    job-validation:
+      url: ${BASE_URL:http://localhost:8081}/data-connect/data-integration/jobs/validate
+    job-child-execute:
+      url: ${BASE_URL:http://localhost:8080}/data-connect/data-integration/jobs/execute/child
