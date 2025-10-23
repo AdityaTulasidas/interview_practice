@@ -1,0 +1,59 @@
+spring:
+  rabbitmq:
+    connections:
+      source:
+        host: ${AMER_RABBITMQ_HOST}
+        port: ${AMER_RABBITMQ_PORT}
+        username: ${AMER_RABBITMQ_USERNAME}
+        password: ${AMER_RABBITMQ_PASSWORD}
+        ssl:
+          enabled: true
+          algorithm: TLSv1.2
+        job:
+          queue:
+              name:  DATA_SYNC_QUEUE_MS
+          routing:
+            key:
+              name: AMER_MS
+          exchange:
+            name: DATA_SYNC_EXCHANGE_MS
+        source:
+          queue:
+            name: DATA_TASK_EMEA_MS
+          routing:
+            key:
+              name: EMEA_MS
+          exchange:
+            name: DATA_TASK_EXCHANGE_MS
+        listener:
+          simple:
+            acknowledge-mode: Manual
+        concurrentConsumers: 5
+        maxConcurrentConsumers: 10
+      target:
+        - host: ${EMEA_RABBITMQ_HOST}
+          region-key: EMEA
+          port: ${EMEA_RABBITMQ_PORT}
+          username: ${EMEA_RABBITMQ_USERNAME}
+          password: ${EMEA_RABBITMQ_PASSWORD}
+          ssl:
+            enabled: true
+            algorithm: TLSv1.2
+          queue:
+            name: DATA_TASK_EMEA_MS
+          exchange:
+            name: DATA_TASK_EXCHANGE_MS
+          routing:
+            key:
+              name: EMEA_MS
+          concurrentConsumers: 5
+          maxConcurrentConsumers: 10
+aws:
+  s3:
+    region: ${S3_AMER_REGION}
+    source-bucket-name: ${AMER_BUCKET_NAME}
+    input-folder: ${S3_INPUT_FOLDER}
+    target-region:
+      - region-key: EMEA
+        region-name: ${S3_EMEA_REGION}
+        bucket-name: ${EMEA_BUCKET_NAME}

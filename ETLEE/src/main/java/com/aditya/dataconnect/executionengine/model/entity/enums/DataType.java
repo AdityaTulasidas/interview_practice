@@ -1,0 +1,73 @@
+package com.aditya.dataconnect.executionengine.model.entity.enums;
+
+public enum DataType {
+    // Common data types
+    STRING,
+    INTEGER,
+    FLOAT,
+    BOOLEAN,
+    DATE,
+    TIMESTAMP,
+
+    // Oracle specific data types
+    NUMBER,
+    VARCHAR2,
+    CHAR,
+    NCHAR,
+    NVARCHAR2,
+    CLOB,
+    NCLOB,
+    BLOB,
+    BFILE,
+    RAW,
+    LONG,
+    LONG_RAW,
+    ROWID,
+    UROWID,
+    XMLTYPE,
+
+    // SQL Server specific data types
+    BIGINT,
+    SMALLINT,
+    TINYINT,
+    DECIMAL,
+    NUMERIC,
+    MONEY,
+    SMALLMONEY,
+    DATETIME,
+    SMALLDATETIME,
+    DATETIME2,
+    DATETIMEOFFSET,
+    TIME,
+    UNIQUEIDENTIFIER,
+    SQL_VARIANT,
+    XML,
+    GEOGRAPHY,
+    GEOMETRY,
+    HIERARCHYID,
+
+    // PostgreSQL specific data types
+    SERIAL,
+    BIGSERIAL,
+    TEXT,
+    TEXT_ARRAY,// Added for PostgreSQL text[]
+    BYTEA,
+    JSON,
+    JSONB,
+    UUID,
+    ARRAY,
+    HSTORE,
+    CIDR,
+    INET,
+    MACADDR,
+    TSQUERY,
+    TSVECTOR,
+    BOX,
+    CIRCLE,
+    LINE,
+    LSEG,
+    PATH,
+    POINT,
+    POLYGON,
+    DOUBLEPRECISION
+}
