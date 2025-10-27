@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: execution-engine
+  datasource:
+    url: jdbc:postgresql://${DATACONNECT_EXECUTION_ENGINE_DB_CONN_STR}:5432/${EXECUTION_ENGINE_DB:dataconnectdb}
+    username: ${DATACONNECT_EXECUTION_ENGINE_DB_USER:dataconnect}
+    password: ${DATACONNECT_EXECUTION_ENGINE_DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    # WARNING: The fallback value 'localhost' is intended for local development and testing only.
+    # Ensure that the DATACONNECT_EXECUTION_ENGINE_DB_CONN_STR environment variable is set in production.
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+server:
+  port: 8080
+  enabled: true
+  servlet:
+    context-path: /data-connect/execution-engine
+  ui-url: ${AMER_BASE_URL:http://localhost:4200}
+springdoc:
+  api-docs:
+    path: /data-connect-execution-engine/openapi-endpoint
+get:
+  metaobject:
+    api:
+      url: http://metadata-service/api/metaobjects/
+  datasource:
+    api:
+      url: http://datasource-service/api/datasources/
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,beans,env,loggers
+  health:
+    elasticsearch:
+      enabled: false
+    defaults:
+      exclude: elasticsearch
+  endpoint:
+    health:
+      show-details: always
+      exclude: elasticsearch
+
+datasource:
+  hikari:
+    maximum-pool-size: 10
+    max-lifetime: 1800000
+    leak-detection-threshold: 2000
+    housekeeping-period-ms: 30000
+
+BASE_DIR: ${BASE_DIR:/data-connect}
+META_REGISTRY_API_URL: ${AMER_BASE_URL}/data-connect/metadata-registry
+DELTA_NEW_RECORD_THRESHOLD_IN_SECS: ${NEW_RECORDS_DELTA_THRESHOLD_IN_SECS:60}
+
+dataconnect:
+  data-integration:
+    region-urls:
+      AMER: ${AMER_BASE_URL}/data-connect/data-integration/job-execution-log
+      EMEA: http://internal-a209259-dev-data26ac2fd16bc924b4-160669111.eu-west-2.elb.amazonaws.com/data-connect/data-integration/job-execution-log
+
+profiles:
+  active: ${SPRING_PROFILES_ACTIVE:AMER}
+transithub:
+  service-url: ${TRANSITHUB_SERVICE_URL:int.api.transit-hub.thomsonreuters.com}

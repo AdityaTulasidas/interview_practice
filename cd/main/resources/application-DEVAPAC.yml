@@ -1,0 +1,83 @@
+app:
+  region: EMEA
+  provider: AWS
+spring:
+  rabbitmq:
+    connections:
+      activity-log:
+        host: localhost
+        port: 5674
+        username: guest
+        password: guest
+        ssl:
+          enabled: true
+          algorithm: TLSv1.2
+        exchange:
+          name: activity_log
+        queues:
+          name: EMEA_activity
+          routing:
+            key:
+              name: EMEA
+        listener:
+          simple:
+            acknowledge-mode: manual
+        concurrentConsumers: ${CONCURRENT_CONSUMERS:5}
+        maxConcurrentConsumers: ${MAX_CONCURRENT_CONSUMERS:10}
+      data-sync:
+        source:
+          host: localhost
+          port: 5674
+          username: guest
+          password: guest
+          ssl:
+            enabled: true
+            algorithm: TLSv1.2
+          job:
+            queue:
+              name: DATA_SYNC_QUEUE
+            routing:
+              key:
+                name: DATA_SYNC
+            exchange:
+              name: DATA_SYNC_EXCHANGE
+          source:
+            queue:
+              name: DATA_TASK_APAC
+            routing:
+              key:
+                name: APAC
+            exchange:
+              name: DATA_TASK_EXCHANGE
+          listener:
+            simple:
+              acknowledge-mode: auto
+          concurrentConsumers: 1
+          maxConcurrentConsumers: 2
+        target:
+          - host: localhost
+            port: 5672
+            username: guest
+            password: guest
+            region-key: AMER
+            ssl:
+              enabled: true
+              algorithm: TLSv1.2
+            queue:
+              name: DATA_TASK_AMER
+            exchange:
+              name: DATA_TASK_EXCHANGE
+            routing:
+              key:
+                name: AMER
+            concurrentConsumers: 1
+            maxConcurrentConsumers: 2
+aws:
+  s3:
+    region: ${S3_EMEA_REGION}
+    source-bucket-name: ${EMEA_BUCKET_NAME}
+    input-folder: ${S3_INPUT_FOLDER}
+    target-region:
+      - region-key: AMER
+        region-name: ${S3_AMER_REGION}
+        bucket-name: ${AMER_BUCKET_NAME}

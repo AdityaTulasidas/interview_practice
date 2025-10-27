@@ -1,0 +1,112 @@
+app:
+  region: EMEA
+  provider: AWS
+spring:
+  rabbitmq:
+    connections:
+      activity-log:
+        host: ${EMEA_RABBITMQ_HOST}
+        port: ${EMEA_RABBITMQ_PORT}
+        username: ${EMEA_RABBITMQ_USERNAME}
+        password: ${EMEA_RABBITMQ_PASSWORD}
+        ssl:
+          enabled: true
+          algorithm: TLSv1.2
+        exchange:
+          name: activity_log
+        queues:
+          name: EMEA_activity
+          routing:
+            key:
+              name: EMEA
+        listener:
+          simple:
+            acknowledge-mode: manual
+        concurrentConsumers: ${CONCURRENT_CONSUMERS:5}
+        maxConcurrentConsumers: ${MAX_CONCURRENT_CONSUMERS:10}
+      data-sync:
+        source:
+          host: ${EMEA_RABBITMQ_HOST}
+          port: ${EMEA_RABBITMQ_PORT}
+          username: ${EMEA_RABBITMQ_USERNAME}
+          password: ${EMEA_RABBITMQ_PASSWORD}
+          ssl:
+            enabled: true
+            algorithm: TLSv1.2
+          job:
+            queue:
+              name: ${DATA_SYNC_QUEUE}
+            routing:
+              key:
+                name: ${DATA_SYNC_ROUTING_KEY}
+            exchange:
+              name: ${DATA_SYNC_EXCHANGE}
+          source:
+            queue:
+              name: ${DATA_TASK_QUEUE_EMEA}
+            routing:
+              key:
+                name: ${DATA_SYNC_ROUTING_KEY_EMEA}
+            exchange:
+              name: ${DATA_TASK_EXCHANGE}
+            concurrentConsumers: ${CONCURRENT_CONSUMERS:5}
+            maxConcurrentConsumers: ${MAX_CONCURRENT_CONSUMERS:10}
+          fileSource:
+            queue:
+              name: DATA_TASK_FILE_EMEA
+            routing:
+              key:
+                name: EMEA
+            exchange:
+              name: DATA_TASK_FILE_EXCHANGE
+          listener:
+            simple:
+              acknowledge-mode: auto
+          concurrentConsumers: 1
+          maxConcurrentConsumers: 1
+          prefetchCount: 1
+        dataStreamTargets:
+          - host: ${AMER_RABBITMQ_HOST:localhost}
+            port: ${AMER_RABBITMQ_PORT:5671}
+            username: ${AMER_RABBITMQ_USERNAME:guest}
+            password: ${AMER_RABBITMQ_PASSWORD:guest}
+            region-key: AMER
+            ssl:
+              enabled: true
+              algorithm: TLSv1.2
+            queue:
+              name: ${DATA_TASK_AMER}
+            exchange:
+              name: ${DATA_TASK_EXCHANGE}
+            routing:
+              key:
+                name: ${DATA_SYNC_ROUTING_KEY_AMER}
+            concurrentConsumers: 1
+            maxConcurrentConsumers: 2
+        fileTargets:
+          - host: ${AMER_RABBITMQ_HOST}
+            port: ${AMER_RABBITMQ_PORT}
+            username: ${AMER_RABBITMQ_USERNAME}
+            password: ${AMER_RABBITMQ_PASSWORD}
+            region-key: AMER
+            ssl:
+              enabled: true
+              algorithm: TLSv1.2
+            queue:
+              name: DATA_TASK_FILE_AMER
+            exchange:
+              name: DATA_TASK_FILE_EXCHANGE
+            routing:
+              key:
+                name: AMER
+
+aws:
+  region: ${S3_EMEA_REGION}
+  s3:
+    region: ${S3_EMEA_REGION}
+    source-bucket-name: ${EMEA_BUCKET_NAME}
+    input-folder: ${S3_INPUT_FOLDER}
+    target-region:
+      - region-key: AMER
+        region-name: ${S3_AMER_REGION}
+        bucket-name: ${AMER_BUCKET_NAME}

@@ -1,0 +1,132 @@
+app:
+  region: AMER
+  provider: AWS
+spring:
+  rabbitmq:
+    connections:
+      activity-log:
+        host: ${AMER_RABBITMQ_HOST:localhost}
+        port: ${AMER_RABBITMQ_PORT:5671}
+        username: ${AMER_RABBITMQ_USERNAME:guest}
+        password: ${AMER_RABBITMQ_PASSWORD:guest}
+        ssl:
+          enabled: true
+          algorithm: TLSv1.2
+        exchange:
+          name: activity_log
+        queues:
+          name: AMER_activity
+          routing:
+            key:
+              name: AMER
+        listener:
+          simple:
+            acknowledge-mode: manual
+        concurrentConsumers: ${CONCURRENT_CONSUMERS:5}
+        maxConcurrentConsumers: ${MAX_CONCURRENT_CONSUMERS:10}
+      data-sync:
+        source:
+          host: ${AMER_RABBITMQ_HOST}
+          port: ${AMER_RABBITMQ_PORT}
+          username: ${AMER_RABBITMQ_USERNAME}
+          password: ${AMER_RABBITMQ_PASSWORD}
+          ssl:
+            enabled: true
+            algorithm: TLSv1.2
+          job:
+            queue:
+              name: ${DATA_SYNC_QUEUE}
+            routing:
+              key:
+                name: ${DATA_SYNC_ROUTING_KEY}
+            exchange:
+              name: ${DATA_SYNC_EXCHANGE}
+          source:
+            queue:
+              name: ${DATA_TASK_QUEUE_AMER}
+            routing:
+              key:
+                name: ${DATA_SYNC_ROUTING_KEY_AMER}
+            exchange:
+              name: ${DATA_TASK_EXCHANGE}
+          fileSource:
+            queue:
+              name: DATA_TASK_FILE_AMER
+            routing:
+              key:
+                name: AMER
+            exchange:
+              name: DATA_TASK_FILE_EXCHANGE
+          listener:
+            simple:
+              acknowledge-mode: auto
+          concurrentConsumers: 1
+          maxConcurrentConsumers: 1
+          prefetchCount: 1
+        dataStreamTargets:
+          - host: ${EMEA_RABBITMQ_HOST}
+            port: ${EMEA_RABBITMQ_PORT}
+            username: ${EMEA_RABBITMQ_USERNAME}
+            password: ${EMEA_RABBITMQ_PASSWORD}
+            region-key: ${DATA_SYNC_ROUTING_KEY_EMEA}
+            ssl:
+              enabled: true
+              algorithm: TLSv1.2
+            queue:
+              name: ${DATA_TASK_QUEUE_EMEA}
+            exchange:
+              name: ${DATA_TASK_EXCHANGE}
+            routing:
+              key:
+                name: ${DATA_SYNC_ROUTING_KEY_EMEA}
+            concurrentConsumers: 1
+            maxConcurrentConsumers: 2
+          - host: ${APAC_RABBITMQ_HOST:""}
+            port: ${APAC_RABBITMQ_PORT:0}
+            username: ${APAC_RABBITMQ_USERNAME:""}
+            password: ${APAC_RABBITMQ_PASSWORD:""}
+            region-key: ${DATA_SYNC_ROUTING_KEY_APAC:""}
+            ssl:
+              enabled: true
+              algorithm: TLSv1.2
+            queue:
+              name: ${DATA_TASK_QUEUE_APAC:""}
+            exchange:
+              name: ${DATA_TASK_EXCHANGE:""}
+            routing:
+              key:
+                name: ${DATA_SYNC_ROUTING_KEY_APAC:""}
+            concurrentConsumers: 1
+            maxConcurrentConsumers: 2
+        fileTargets:
+          - host: ${EMEA_RABBITMQ_HOST}
+            port: ${EMEA_RABBITMQ_PORT}
+            username: ${EMEA_RABBITMQ_USERNAME}
+            password: ${EMEA_RABBITMQ_PASSWORD}
+            region-key: EMEA
+            ssl:
+              enabled: true
+              algorithm: TLSv1.2
+            queue:
+              name: DATA_TASK_FILE_EMEA
+            exchange:
+              name: DATA_TASK_FILE_EXCHANGE
+            routing:
+              key:
+                name: EMEA
+            concurrentConsumers: 1
+            maxConcurrentConsumers: 2
+
+aws:
+  region: ${S3_AMER_REGION}
+  s3:
+    region: ${S3_AMER_REGION}
+    source-bucket-name: ${AMER_BUCKET_NAME}
+    input-folder: ${S3_INPUT_FOLDER}
+    target-region:
+      - region-key: EMEA
+        region-name: ${S3_EMEA_REGION}
+        bucket-name: ${EMEA_BUCKET_NAME}
+      - region-key: ${DATA_SYNC_ROUTING_KEY_APAC:""}
+        region-name: ${S3_APAC_REGION:eu-west-1}
+        bucket-name: ${APAC_BUCKET_NAME:""}
