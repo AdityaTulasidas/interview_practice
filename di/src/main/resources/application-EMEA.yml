@@ -1,0 +1,39 @@
+app:
+  region: EMEA
+
+spring:
+  rabbitmq:
+    connections:
+      first:
+        host: ${SOURCE_EMEA_RABBITMQ_HOST:localhost}
+        port: ${SOURCE_EMEA_RABBITMQ_PORT:5671}
+        username: ${SOURCE_EMEA_RABBITMQ_USERNAME:guest}
+        password: ${SOURCE_EMEA_RABBITMQ_PASSWORD:guest}
+        ssl:
+          enabled: true
+          algorithm: TLSv1.2
+        exchange:
+          name: activity_log
+        queues:
+          name: EMEA_activity
+          routing:
+            key:
+              name: EMEA
+        listener:
+          simple:
+            acknowledge-mode: manual
+        concurrentConsumers: ${CONCURRENT_CONSUMERS:5}
+        maxConcurrentConsumers: ${MAX_CONCURRENT_CONSUMERS:10}
+      second:
+        host: ${SOURCE_EMEA_RABBITMQ_HOST:localhost}
+        port: ${SOURCE_EMEA_RABBITMQ_PORT:5671}
+        username: ${SOURCE_EMEA_RABBITMQ_USERNAME:guest}
+        password: ${SOURCE_EMEA_RABBITMQ_PASSWORD:guest}
+        queue:
+          name: DATA_SYNC_QUEUE
+          routing:
+            key:
+              name: DATA_SYNC
+        exchange:
+          name: DATA_SYNC_EXCHANGE
+META_REGISTRY_API_URL: ${AMER_BASE_URL}/data-connect/metadata-registry

@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: DataConnectDataIntegration
+  datasource:
+    url: jdbc:postgresql://${DATACONNECT_DATA_INTEGRATION_DB_CONN_STR:localhost}:5432/${DATA_INTEGRATION_DB:postgres}
+    username: ${DATACONNECT_DATA_INTEGRATION_DB_USER:postgresql}
+    password: ${DATACONNECT_DATA_INTEGRATION_DB_PASSWORD:postgresql}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+server:
+  port: 8081
+  enabled: true
+  servlet:
+    context-path: /data-connect/data-integration
+  ui-url: ${AMER_BASE_URL:http://localhost:4200}
+
+springdoc:
+  api-docs:
+    path: /openapi-endpoint
+
+get:
+  metaobject:
+    api:
+      url: http://metadata-service/api/metaobjects/
+  datasource:
+    api:
+      url: http://datasource-service/api/datasources/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,beans,env,loggers
+  health:
+    elasticsearch:
+      enabled: false
+    defaults:
+      exclude: elasticsearch
+  endpoint:
+    health:
+      show-details: always
+      exclude: elasticsearch
+  oauth:
+    url: https://auth-nonprod.thomsonreuters.com/oauth/token
+    token-request:
+      client_id: zfmcqxVh9rpKkkw62QB40Xzi8s6B9j0m
+      grant_type: client_credentials
+      client_secret: kD5ExuiU9MzOZ5igm-s7vEMPJ8CZXT5GzN7IKQ6KffFLtKpk7b1VdLo-6Du9MquZ
+      audience: 5e6a4453-48f4-42eb-aa4b-775b5077bff9
+  customer:
+    api:
+      url: https://dev2.onesourcetax.com/dev2/gpam/gpam
+dataconnect:
+  data-integration:
+    region-urls:
+      AMER: ${AMER_BASE_URL}/data-connect/data-integration/job-execution-log
+      EMEA: http://internal-a209259-dev-data26ac2fd16bc924b4-160669111.eu-west-2.elb.amazonaws.com/data-connect/data-integration/job-execution-log
+profiles:
+  active: ${SPRING_PROFILES_ACTIVE:AMER}

@@ -1,0 +1,47 @@
+app:
+  region: AMER
+
+spring:
+  rabbitmq:
+    connections:
+      first:
+        host: localhost
+        port: 5672
+        username: guest
+        password: guest
+        ssl:
+          enabled: true
+          algorithm: TLSv1.2
+        exchange:
+          name: activity_log
+        queues:
+          name: AMER_activity
+          routing:
+            key:
+              name: AMER
+        listener:
+          simple:
+            acknowledge-mode: manual
+        concurrentConsumers: ${CONCURRENT_CONSUMERS:5}
+        maxConcurrentConsumers: ${MAX_CONCURRENT_CONSUMERS:10}
+      second:
+        host: localhost
+        port: 5672
+        username: guest
+        password: guest
+        queue:
+          name: DATA_SYNC_QUEUE
+          routing:
+            key:
+              name: DATA_SYNC
+        exchange:
+          name: DATA_SYNC_EXCHANGE
+META_REGISTRY_API_URL: http://localhost:8086/data-connect/metadata-registry
+dataconnect:
+  data-integration-service:
+    api:
+      url: http://localhost:8080/data-connect/data-integration/swagger-ui/index.html#/data-integration-manager-controller/publishDataSync  # TODO: Set the correct URL for your environment
+    job-validation:
+      url: http://localhost:8080/data-connect/data-integration/swagger-ui/index.html#/data-integration-manager-controller/validateDataSyncJob  # TODO: Set the correct URL for your environment
+    job-child-execute:
+      url: http://localhost:8080/data-connect/data-integration/swagger-ui/index.html#/data-integration-manager-controller/executeChildJob  # TODO: Set the correct URL for your environment
