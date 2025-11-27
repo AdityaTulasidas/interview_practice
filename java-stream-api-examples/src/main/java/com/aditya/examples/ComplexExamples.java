@@ -22,8 +22,21 @@ public class ComplexExamples {
         OptionalDouble avgsal = EmployeeData.getEmployees().stream().mapToDouble(Employee::getSalary).average();
         double avgSal = avgsal.getAsDouble();
         EmployeeData.getEmployees().stream().filter(emp -> emp.getSalary() > avgSal).collect(Collectors.toList()).forEach(System.out::println);
-
     }
+//        17. Get distinct cities from a list of employees, sorted alphabetically
+
+    public static void getEmployeesFromDiffCity() {
+        EmployeeData.getEmployees().stream().map(Employee::getCity).distinct().sorted().collect(Collectors.toList());
 
 
+
+
+
+
+
+
+
+
+                //.distinct().sorted().collect(Collectors.toList()).forEach(System.out::println);
+    }
 }
